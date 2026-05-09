@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\MediaController;
+use App\Http\Controllers\LibraryController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -18,3 +20,13 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+Route::get('/media', [MediaController::class, 'index'])->name('media.index');
+
+Route::post('/media/{id}/planned', [LibraryController::class, 'addToPlanned'])
+    ->middleware('auth')
+    ->name('library.planned');
+
+Route::get('/library', [LibraryController::class, 'index'])
+    ->middleware('auth')
+    ->name('library.index');
