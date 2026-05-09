@@ -1,32 +1,50 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Media List
+        <h2 class="font-semibold text-xl text-gray-100 leading-tight">
+            WatchList+ Media
         </h2>
     </x-slot>
 
-    <div class="py-6">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+    <div style="background-color: #1f1f1f; min-height: 100vh; padding: 32px;">
+        <div style="max-width: 1000px; margin: 0 auto;">
 
             @if(session('success'))
-                <div class="mb-4 p-4 bg-green-100 text-green-800 rounded">
+                <div style="background-color: #dcfce7; color: #166534; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
                     {{ session('success') }}
                 </div>
             @endif
 
+            <h1 style="color: white; font-size: 28px; margin-bottom: 24px;">
+                Movies and TV Series
+            </h1>
+
             @foreach($mediaItems as $item)
-                <div class="mb-6 p-4 bg-white shadow rounded">
+                <div style="display: flex; gap: 24px; background-color: #2a2a2a; padding: 20px; border-radius: 10px; margin-bottom: 20px; color: white;">
 
-                    <h3 class="text-lg font-bold">{{ $item->title }}</h3>
-                    <p class="text-gray-600">{{ $item->type }}</p>
-                    <p class="mt-2">{{ $item->description }}</p>
+                    <div style="width: 120px; height: 170px; background-color: #444; display: flex; align-items: center; justify-content: center; color: #aaa; border-radius: 6px;">
+                        Poster
+                    </div>
 
-                    <form method="POST" action="/media/{{ $item->id }}/planned" class="mt-3">
-                        @csrf
-                        <button class="px-4 py-2 bg-blue-500 text-white rounded">
-                            Add to Planned
-                        </button>
-                    </form>
+                    <div style="flex: 1;">
+                        <h2 style="font-size: 24px; margin-bottom: 6px;">
+                            {{ $item->title }}
+                        </h2>
+
+                        <p style="color: #9ca3af; margin-bottom: 8px;">
+                            {{ ucfirst($item->type) }}
+                        </p>
+
+                        <p style="color: #d1d5db; margin-bottom: 16px;">
+                            {{ $item->description }}
+                        </p>
+
+                        <form method="POST" action="/media/{{ $item->id }}/planned">
+                            @csrf
+                            <button type="submit" style="background-color: #3b82f6; color: white; padding: 8px 16px; border-radius: 6px;">
+                                Add to Planned
+                            </button>
+                        </form>
+                    </div>
 
                 </div>
             @endforeach

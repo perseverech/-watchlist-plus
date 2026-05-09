@@ -29,9 +29,20 @@ class LibraryController extends Controller
         return redirect('/media')->with('success', 'Item added to Planned list.');
     }
 
+    public function markAsWatched($id)
+    {
+        $item = MediaUser::where('user_id', Auth::id())->findOrFail($id);
+
+        $item->update([
+            'status' => 'watched',
+        ]);
+
+        return redirect('/library')->with('success', 'Item marked as watched.');
+    }
+
     public function destroy($id)
     {
-        $item = MediaUser::findOrFail($id);
+        $item = MediaUser::where('user_id', Auth::id())->findOrFail($id);
 
         $item->delete();
 
