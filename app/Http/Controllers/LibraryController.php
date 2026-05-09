@@ -28,4 +28,13 @@ class LibraryController extends Controller
 
         return redirect('/media')->with('success', 'Item added to Planned list.');
     }
+
+    public function destroy($id)
+    {
+        $item = MediaUser::findOrFail($id);
+
+        $item->delete();
+
+        return redirect('/library')->with('success', 'Item removed.');
+    }
 }

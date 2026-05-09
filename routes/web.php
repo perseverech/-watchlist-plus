@@ -17,16 +17,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/library', [LibraryController::class, 'index'])->name('library.index');
+    Route::post('/media/{id}/planned', [LibraryController::class, 'addToPlanned'])->name('library.planned');
+    Route::delete('/library/{id}', [LibraryController::class, 'destroy'])->name('library.destroy');
 });
 
 require __DIR__.'/auth.php';
 
 Route::get('/media', [MediaController::class, 'index'])->name('media.index');
-
-Route::post('/media/{id}/planned', [LibraryController::class, 'addToPlanned'])
-    ->middleware('auth')
-    ->name('library.planned');
-
-Route::get('/library', [LibraryController::class, 'index'])
-    ->middleware('auth')
-    ->name('library.index');

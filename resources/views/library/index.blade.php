@@ -8,6 +8,12 @@
     <div class="py-6">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
 
+            @if(session('success'))
+                <div class="mb-4 p-4 bg-green-100 text-green-800 rounded">
+                    {{ session('success') }}
+                </div>
+            @endif
+
             @if($items->isEmpty())
                 <div class="p-4 bg-white shadow rounded">
                     <p>Your library is empty.</p>
@@ -16,17 +22,18 @@
 
             @foreach($items as $item)
                 <div class="mb-4 p-4 bg-white shadow rounded">
-                    <h3 class="text-lg font-bold">
-                        {{ $item->mediaItem->title }}
-                    </h3>
+                    <h3 class="text-lg font-bold">{{ $item->mediaItem->title }}</h3>
+                    <p class="text-gray-600">{{ $item->mediaItem->type }}</p>
+                    <p><strong>Status:</strong> {{ $item->status }}</p>
 
-                    <p class="text-gray-600">
-                        {{ $item->mediaItem->type }}
-                    </p>
+                    <form method="POST" action="{{ route('library.destroy', $item->id) }}" style="margin-top: 12px;">
+                        @csrf
+                        @method('DELETE')
 
-                    <p>
-                        <strong>Status:</strong> {{ $item->status }}
-                    </p>
+                        <button type="submit" style="background-color: #dc2626; color: white; padding: 8px 16px; border-radius: 6px;">
+                            Remove
+                        </button>
+                    </form>
                 </div>
             @endforeach
 
