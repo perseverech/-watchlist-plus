@@ -46,12 +46,4 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
 require __DIR__.'/auth.php';
 
-/* If you are completely removing Laravel Breeze and want to use your custom 
-auth controllers instead, comment out the "require" line above and uncomment these:
 
-Route::get('/login', [AuthController::class, 'showLogin']);
-Route::post('/login', [AuthController::class, 'login']);
-Route::get('/register', [AuthController::class, 'showRegister']);
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/logout', [AuthController::class, 'logout']);
-*/
