@@ -2,77 +2,83 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\MediaItem;
-use App\Models\Genre;
-use App\Models\Review;
 use App\Models\MediaUser;
+use Illuminate\Http\Request;
 
 class MediaController extends Controller
 {
-    /**
-     * GET /
-     * Homepage — renders media/index.blade.php
-     */
     public function index()
     {
-        // ⚠️ DEPENDS ON AL'ZHANA: getTrending() on MediaItem model
-        $trending = MediaItem::getTrending();
+        $trending = MediaItem::latest()->get();
 
-        // ⚠️ DEPENDS ON AL'ZHANA: Genre model
-        $genres = Genre::all();
+        $genres = MediaItem::whereNotNull('genre')
+            ->select('genre')
+            ->distinct()
+            ->orderBy('genre')
+            ->get()
+            ->map(function ($item) {
+                return (object)[
+                    'id' => $item->genre,
+                    'name' => $item->genre,
+                ];
+            });
 
         return view('media.index', compact('trending', 'genres'));
     }
 
-    /**
-     * GET /media/{id}
-     * Detail page — renders media/show.blade.php
-     */
-    public function show($id)
+    public function search(Request $request)
     {
-        // ⚠️ DEPENDS ON AL'ZHANA: getById() fetching from external API + DB
-        $media = MediaItem::getById($id);
+        $query = MediaItem::query();
 
-        if (!$media) {
-            abort(404);
+        if ($request->filled('query')) {
+            $query->where('title', 'like', '%' . $request->query('query') . '%');
         }
 
-        // ⚠️ DEPENDS ON AL'ZHANA: Review model with user() relationship
-        $reviews = Review::with('user')
-            ->where('media_id', $id)
-            ->latest()
-            ->get();
+        if ($request->filled('genre')) {
+            $query->where('genre', $request->query('genre'));
+        }
 
-        // Check current user's library status
+        if ($request->filled('type')) {
+            $type = $request->query('type') === 'tv'
+                ? 'series'
+                : $request->query('type');
+
+            $query->where('type', $type);
+        }
+
+        $items = $query->get()->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'title' => $item->title,
+                'poster' => $item->poster,
+                'rating' => round($item->reviews->avg('rating') ?? 0, 1),
+                'type' => $item->type,
+                'year' => $item->year,
+            ];
+        });
+
+        return response()->json($items);
+    }
+
+    public function show($id)
+    {
+        $media = MediaItem::findOrFail($id);
+
+        $reviews = $media->reviews()->latest()->get();
+
         $userStatus = null;
+
         if (auth()->check()) {
-            $entry = MediaUser::where('user_id', auth()->id())
-                ->where('media_id', $id)
+            $record = MediaUser::where('user_id', auth()->id())
+                ->where('media_item_id', $id)
                 ->first();
-            $userStatus = $entry?->status;
+
+            if ($record) {
+                $userStatus = $record->status;
+            }
         }
 
         return view('media.show', compact('media', 'reviews', 'userStatus'));
-    }
-
-    /**
-     * GET /search
-     * AJAX endpoint — called by search.js
-     */
-    public function search(Request $request)
-    {
-        if (!$request->ajax()) {
-            abort(403);
-        }
-
-        $query = $request->input('query', '');
-        $genre = $request->input('genre', '');
-        $type  = $request->input('type', '');
-
-        // ⚠️ DEPENDS ON AL'ZHANA: search() on MediaItem model
-        $results = MediaItem::search($query, $genre, $type);
-
-        return response()->json($results);
     }
 }

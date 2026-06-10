@@ -1,341 +1,121 @@
-{{-- ============================================================
-     FILE: resources/views/media/show.blade.php
-     Media detail page — poster, info, library buttons, reviews
-
-     ⚠️ DEPENDS ON AL'ZHANA — MediaController@show must pass:
-       $media = [
-         'id'          => int,
-         'title'       => string,
-         'poster'      => string (URL),
-         'backdrop'    => string (wide banner URL — can be null),
-         'description' => string,
-         'rating'      => float,
-         'type'        => 'movie' | 'tv',
-         'year'        => int,
-         'genres'      => ['Action', 'Drama', ...],
-         'runtime'     => int (minutes — optional),
-       ]
-       $reviews    = Review::with('user')->where('media_id', ...)->latest()->get()
-       $userStatus = 'planned' | 'watched' | null  (current user's status for this media)
-     ============================================================ --}}
 @extends('layouts.app')
-@section('title', $media['title'] ?? 'Media Detail')
+@section('title', $media->title ?? 'Media Detail')
 
 @section('content')
 
-{{-- ===== HERO BACKDROP ===== --}}
-<div class="media-hero"
-    @if(!empty($media['backdrop']))
-        style="background-image: linear-gradient(to bottom, rgba(10,10,15,0.25) 0%, rgba(10,10,15,1) 70%), url('{{ $media['backdrop'] }}');"
-    @endif
->
-    <div class="media-hero__content">
+<div style="max-width: 1000px; margin: 0 auto; padding: 48px 24px;">
 
-        {{-- Poster --}}
-        <div class="media-hero__poster">
-            @if(!empty($media['poster']))
-                <img src="{{ $media['poster'] }}" alt="{{ $media['title'] }}">
-            @else
-                <div class="media-hero__no-poster">No Poster</div>
-            @endif
+    <a href="{{ route('home') }}" style="color: #e8462a; text-decoration: none;">
+        Back to Home
+    </a>
+
+    <div style="display: flex; gap: 32px; margin-top: 32px; align-items: flex-start;">
+        <div style="width: 220px; height: 330px; background: #13131a; border: 1px solid #1e1e2e; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #6b6b80;">
+            No Poster
         </div>
 
-        {{-- Info --}}
-        <div class="media-hero__info">
-
-            {{-- Badges row --}}
-            <div class="media-hero__badges">
-                <span class="badge badge--type">{{ strtoupper($media['type'] ?? 'MOVIE') }}</span>
-                @if(!empty($media['year']))
-                    <span class="badge badge--meta">{{ $media['year'] }}</span>
+        <div style="flex: 1;">
+            <p style="color: #e8462a; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">
+                {{ $media->type }}
+                @if($media->year)
+                    • {{ $media->year }}
                 @endif
-                @if(!empty($media['runtime']))
-                    <span class="badge badge--meta">{{ $media['runtime'] }} min</span>
-                @endif
-            </div>
-
-            <h1 class="media-hero__title">{{ $media['title'] }}</h1>
-
-            {{-- Rating --}}
-            <div class="media-hero__rating">
-                <span class="rating-star">⭐</span>
-                <span class="rating-value">{{ number_format($media['rating'] ?? 0, 1) }}</span>
-                <span class="rating-max">/10</span>
-            </div>
-
-            {{-- Genres --}}
-            @if(!empty($media['genres']))
-                <div class="media-hero__genres">
-                    @foreach($media['genres'] as $genre)
-                        <span class="genre-pill">{{ $genre }}</span>
-                    @endforeach
-                </div>
-            @endif
-
-            {{-- Description --}}
-            <p class="media-hero__description">
-                {{ $media['description'] ?? 'No description available.' }}
             </p>
 
-            {{-- ===== LIBRARY BUTTONS — only for logged-in users ===== --}}
+            <h1 style="font-size: 52px; font-family: var(--font-display); letter-spacing: 1px; margin-bottom: 16px;">
+                {{ $media->title }}
+            </h1>
+
+            <p style="color: #6b6b80; margin-bottom: 24px; max-width: 600px;">
+                {{ $media->description }}
+            </p>
+
             @auth
-                <div class="library-actions" id="library-actions">
-                    <button
-                        id="btn-planned"
-                        class="lib-btn {{ ($userStatus ?? '') === 'planned' ? 'lib-btn--active' : '' }}"
-                        onclick="updateLibraryStatus({{ $media['id'] }}, 'planned')"
-                    >
-                        📋 {{ __('messages.planned') }}
-                    </button>
-                    <button
-                        id="btn-watched"
-                        class="lib-btn lib-btn--watched {{ ($userStatus ?? '') === 'watched' ? 'lib-btn--active' : '' }}"
-                        onclick="updateLibraryStatus({{ $media['id'] }}, 'watched')"
-                    >
-                        ✅ {{ __('messages.watched') }}
-                    </button>
-                    {{-- Remove button — only if already in library --}}
-                    @if(!empty($userStatus))
-                        <button id="btn-remove" class="lib-btn lib-btn--remove" onclick="removeFromLibrary({{ $media['id'] }})">
-                            ✕ Remove
+                <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+                    <form method="POST" action="{{ route('library.update') }}">
+                        @csrf
+                        <input type="hidden" name="media_item_id" value="{{ $media->id }}">
+                        <input type="hidden" name="status" value="planned">
+
+                        <button type="submit" style="background: {{ ($userStatus ?? '') === 'planned' ? '#e8462a' : '#13131a' }}; color: #e8e8f0; border: 1px solid #1e1e2e; padding: 10px 18px; border-radius: 8px; cursor: pointer;">
+                            Planned
                         </button>
+                    </form>
+
+                    <form method="POST" action="{{ route('library.update') }}">
+                        @csrf
+                        <input type="hidden" name="media_item_id" value="{{ $media->id }}">
+                        <input type="hidden" name="status" value="watched">
+
+                        <button type="submit" style="background: {{ ($userStatus ?? '') === 'watched' ? '#e8462a' : '#13131a' }}; color: #e8e8f0; border: 1px solid #1e1e2e; padding: 10px 18px; border-radius: 8px; cursor: pointer;">
+                            Watched
+                        </button>
+                    </form>
+
+                    @if(!empty($userStatus))
+                        <form method="POST" action="{{ route('library.remove') }}">
+                            @csrf
+                            <input type="hidden" name="media_item_id" value="{{ $media->id }}">
+
+                            <button type="submit" style="background: #7f1d1d; color: white; border: 1px solid #991b1b; padding: 10px 18px; border-radius: 8px; cursor: pointer;">
+                                Remove
+                            </button>
+                        </form>
                     @endif
                 </div>
             @endauth
-
-            @guest
-                <p class="guest-hint">
-                    <a href="{{ route('login') }}">Log in</a> to add this to your library.
-                </p>
-            @endguest
-
         </div>
     </div>
-</div>
 
-{{-- ===== REVIEWS SECTION ===== --}}
-<section class="reviews-section">
+    <div style="margin-top: 48px;">
+        <h2 style="font-family: var(--font-display); font-size: 32px; margin-bottom: 24px;">
+            Reviews
+        </h2>
 
-    <div class="section-header">
-        <h2 class="section-title">Reviews</h2>
-        <div class="section-line"></div>
-    </div>
+        @auth
+            <form method="POST" action="{{ route('reviews.store') }}" style="background: #13131a; border: 1px solid #1e1e2e; border-radius: 12px; padding: 24px; margin-bottom: 32px;">
+                @csrf
 
-    {{-- Review form — logged-in users only --}}
-    @auth
-        @include('partials.review-form', ['mediaId' => $media['id']])
-    @endauth
+                <input type="hidden" name="media_item_id" value="{{ $media->id }}">
 
-    @guest
-        <p class="guest-hint" style="margin-bottom:1.5rem;">
-            <a href="{{ route('login') }}">Log in</a> to write a review.
-        </p>
-    @endguest
+                <label style="display: block; margin-bottom: 8px;">
+                    Rating
+                </label>
 
-    {{-- Reviews list --}}
-    <div id="reviews-list">
-        {{-- ⚠️ DEPENDS ON AL'ZHANA: $reviews must have ->user->username, ->rating, ->content, ->id, ->user_id --}}
+                <select name="rating" required style="width: 180px; padding: 10px; margin-bottom: 16px; background: #0a0a0f; color: #e8e8f0; border: 1px solid #1e1e2e; border-radius: 8px;">
+                    <option value="">Select rating</option>
+                    @for($i = 1; $i <= 10; $i++)
+                        <option value="{{ $i }}">{{ $i }}</option>
+                    @endfor
+                </select>
+
+                <label style="display: block; margin-bottom: 8px;">
+                    Review
+                </label>
+
+                <textarea name="comment" rows="4" placeholder="Write your review..." style="width: 100%; padding: 12px; background: #0a0a0f; color: #e8e8f0; border: 1px solid #1e1e2e; border-radius: 8px; margin-bottom: 16px;"></textarea>
+
+                <button type="submit" style="background: #e8462a; color: white; padding: 10px 18px; border: none; border-radius: 8px; cursor: pointer;">
+                    Submit Review
+                </button>
+            </form>
+        @endauth
+
         @forelse($reviews as $review)
-            @include('partials.review-card', ['review' => $review])
+            <div style="background: #13131a; border: 1px solid #1e1e2e; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+                <p style="color: #f5a623; margin-bottom: 8px;">
+                    Rating: {{ $review->rating }}/10
+                </p>
+
+                <p style="color: #e8e8f0;">
+                    {{ $review->comment ?? $review->content }}
+                </p>
+            </div>
         @empty
-            <p class="empty-reviews" id="no-reviews-msg">No reviews yet. Be the first!</p>
+            <p style="color: #6b6b80;">No reviews yet. Be the first!</p>
         @endforelse
     </div>
 
-</section>
+</div>
 
 @endsection
-
-@push('styles')
-<style>
-/* ===== HERO ===== */
-.media-hero {
-    min-height: 560px;
-    background-color: var(--color-bg);
-    background-size: cover;
-    background-position: center 20%;
-    display: flex;
-    align-items: flex-end;
-    padding: 0 2.5rem 3.5rem;
-}
-.media-hero__content {
-    max-width: 1100px;
-    margin: 0 auto;
-    width: 100%;
-    display: flex;
-    gap: 3rem;
-    align-items: flex-end;
-}
-
-/* Poster */
-.media-hero__poster {
-    flex-shrink: 0;
-    width: 210px;
-    border-radius: 12px;
-    overflow: hidden;
-    border: 2px solid var(--color-border);
-    box-shadow: 0 24px 60px rgba(0,0,0,0.7);
-}
-.media-hero__poster img { width: 100%; display: block; }
-.media-hero__no-poster {
-    width: 100%;
-    aspect-ratio: 2/3;
-    background: var(--color-surface);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--color-muted);
-    font-size: 0.8rem;
-}
-
-/* Info */
-.media-hero__info { flex: 1; min-width: 0; }
-.media-hero__badges { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
-.badge {
-    font-size: 0.68rem;
-    font-weight: 800;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    padding: 0.22rem 0.6rem;
-    border-radius: 4px;
-}
-.badge--type { background: var(--color-accent); color: #fff; }
-.badge--meta {
-    background: var(--color-surface);
-    color: var(--color-muted);
-    border: 1px solid var(--color-border);
-}
-.media-hero__title {
-    font-family: var(--font-display);
-    font-size: clamp(2.2rem, 5vw, 4rem);
-    letter-spacing: 1px;
-    line-height: 1.05;
-    margin-bottom: 0.8rem;
-}
-.media-hero__rating {
-    display: flex;
-    align-items: baseline;
-    gap: 0.3rem;
-    margin-bottom: 1rem;
-}
-.rating-star  { font-size: 1.1rem; }
-.rating-value { font-size: 1.8rem; font-weight: 700; color: var(--color-accent2); line-height: 1; }
-.rating-max   { font-size: 0.9rem; color: var(--color-muted); }
-.media-hero__genres { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
-.genre-pill {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid var(--color-border);
-    border-radius: 20px;
-    padding: 0.2rem 0.7rem;
-    font-size: 0.78rem;
-    color: var(--color-muted);
-}
-.media-hero__description {
-    color: var(--color-muted);
-    font-size: 0.95rem;
-    line-height: 1.65;
-    max-width: 580px;
-    margin-bottom: 1.8rem;
-}
-
-/* Library buttons */
-.library-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
-.lib-btn {
-    padding: 0.6rem 1.3rem;
-    border-radius: 8px;
-    border: 1px solid var(--color-border);
-    background: var(--color-surface);
-    color: var(--color-muted);
-    font-family: var(--font-body);
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.lib-btn:hover { border-color: var(--color-accent); color: var(--color-text); }
-.lib-btn--active {
-    border-color: var(--color-accent);
-    color: var(--color-text);
-    background: rgba(232,70,42,0.12);
-}
-.lib-btn--remove { color: #e07070; border-color: transparent; }
-.lib-btn--remove:hover { background: rgba(224,112,112,0.08); border-color: rgba(224,112,112,0.3); }
-
-.guest-hint { color: var(--color-muted); font-size: 0.9rem; }
-.guest-hint a { color: var(--color-accent); text-decoration: none; }
-.guest-hint a:hover { text-decoration: underline; }
-
-/* ===== REVIEWS SECTION ===== */
-.reviews-section {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 3rem 2.5rem 4rem;
-}
-.empty-reviews { color: var(--color-muted); font-size: 0.9rem; padding: 1.5rem 0; }
-</style>
-@endpush
-
-@push('scripts')
-<script>
-// ============================================================
-//  LIBRARY STATUS — AJAX (show page)
-//  ⚠️ DEPENDS ON AL'ZHANA:
-//    POST /library/update → { media_id, status } → { success: true }
-//    POST /library/remove → { media_id }         → { success: true }
-// ============================================================
-
-async function updateLibraryStatus(mediaId, status) {
-    try {
-        const res  = await fetch('/library/update', {
-            method: 'POST',
-            headers: {
-                'Content-Type':     'application/json',
-                'X-CSRF-TOKEN':     document.querySelector('meta[name="csrf-token"]').content,
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept':           'application/json',
-            },
-            body: JSON.stringify({ media_id: mediaId, status })
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            document.getElementById('btn-planned').classList.toggle('lib-btn--active', status === 'planned');
-            document.getElementById('btn-watched').classList.toggle('lib-btn--active', status === 'watched');
-
-            // Show remove button if not already there
-            if (!document.getElementById('btn-remove')) {
-                document.getElementById('library-actions').insertAdjacentHTML('beforeend',
-                    `<button id="btn-remove" class="lib-btn lib-btn--remove" onclick="removeFromLibrary(${mediaId})">✕ Remove</button>`
-                );
-            }
-        }
-    } catch (err) {
-        console.error('Library update error:', err);
-    }
-}
-
-async function removeFromLibrary(mediaId) {
-    try {
-        const res  = await fetch('/library/remove', {
-            method: 'POST',
-            headers: {
-                'Content-Type':     'application/json',
-                'X-CSRF-TOKEN':     document.querySelector('meta[name="csrf-token"]').content,
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept':           'application/json',
-            },
-            body: JSON.stringify({ media_id: mediaId })
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            document.getElementById('btn-planned')?.classList.remove('lib-btn--active');
-            document.getElementById('btn-watched')?.classList.remove('lib-btn--active');
-            document.getElementById('btn-remove')?.remove();
-        }
-    } catch (err) {
-        console.error('Library remove error:', err);
-    }
-}
-</script>
-@endpush
-

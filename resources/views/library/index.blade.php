@@ -1,72 +1,100 @@
-{{-- ============================================================
-     FILE: resources/views/library/index.blade.php
-     "My Library" page — planned and watched tabs
-
-     ⚠️ DEPENDS ON AL'ZHANA — UserController@library must pass:
-       $planned — collection of media item arrays (status = 'planned')
-                  each with: id, title, poster, rating, type, year
-       $watched — collection of media item arrays (status = 'watched')
-     ============================================================ --}}
 @extends('layouts.app')
-@section('title', __('messages.my_library'))
+
+@section('title', 'My Library')
 
 @section('content')
 
 <div class="library-page">
 
-    {{-- Header --}}
-    <div class="library-page__header">
-        <h1 class="library-page__title">{{ __('messages.my_library') }}</h1>
-        <p class="library-page__sub">
-            <span>{{ $planned->count() }} {{ __('messages.planned') }}</span>
-            &middot;
-            <span>{{ $watched->count() }} {{ __('messages.watched') }}</span>
-        </p>
-    </div>
+    <h1 class="library-title">MY LIBRARY</h1>
 
-    {{-- Tab buttons --}}
-    <div class="tabs">
-        <button class="tab-btn tab-btn--active" id="tab-planned-btn" onclick="showTab('planned')">
-            📋 {{ __('messages.planned') }}
-            <span class="tab-count">{{ $planned->count() }}</span>
+    <p class="library-subtitle">
+        {{ $planned->count() }} Planned · {{ $watched->count() }} Watched
+    </p>
+
+    <div class="library-tabs">
+        <button id="plannedBtn" class="library-tab active" onclick="showTab('planned')">
+            Planned
+            <span>{{ $planned->count() }}</span>
         </button>
-        <button class="tab-btn" id="tab-watched-btn" onclick="showTab('watched')">
-            ✅ {{ __('messages.watched') }}
-            <span class="tab-count">{{ $watched->count() }}</span>
+
+        <button id="watchedBtn" class="library-tab" onclick="showTab('watched')">
+            Watched
+            <span>{{ $watched->count() }}</span>
         </button>
     </div>
 
-    {{-- Planned tab content --}}
-    <div id="tab-planned" class="tab-content">
+    <div id="plannedTab" class="tab-content">
         @if($planned->isEmpty())
-            <div class="empty-library">
-                <span>📋</span>
-                <p>Nothing in your planned list yet.</p>
-                <a href="{{ route('home') }}" class="btn btn--accent">Browse Media</a>
-            </div>
+            <p class="empty-text">Nothing in your planned list yet.</p>
         @else
-            <div class="media-grid">
-                {{-- ⚠️ DEPENDS ON AL'ZHANA: each $item must be an array or arrayable
-                     with keys: id, title, poster, rating, type, year --}}
+            <div class="library-grid">
                 @foreach($planned as $item)
-                    @include('partials.media-card', ['item' => is_array($item) ? $item : $item->toArray()])
+                    @php
+                        $media = $item->mediaItem;
+                    @endphp
+
+                    @if($media)
+                        <div class="library-card">
+                            @include('partials.media-card', [
+                                'item' => [
+                                    'id' => $media->id,
+                                    'title' => $media->title,
+                                    'poster' => $media->poster ?? null,
+                                    'rating' => round($media->reviews->avg('rating') ?? 0, 1),
+                                    'type' => $media->type,
+                                    'year' => $media->year,
+                                ]
+                            ])
+
+                            <form method="POST" action="{{ route('library.remove') }}">
+                                @csrf
+                                <input type="hidden" name="media_item_id" value="{{ $media->id }}">
+
+                                <button type="submit" class="remove-btn">
+                                    Remove
+                                </button>
+                            </form>
+                        </div>
+                    @endif
                 @endforeach
             </div>
         @endif
     </div>
 
-    {{-- Watched tab content --}}
-    <div id="tab-watched" class="tab-content" style="display:none">
+    <div id="watchedTab" class="tab-content" style="display:none;">
         @if($watched->isEmpty())
-            <div class="empty-library">
-                <span>✅</span>
-                <p>Nothing marked as watched yet.</p>
-                <a href="{{ route('home') }}" class="btn btn--accent">Browse Media</a>
-            </div>
+            <p class="empty-text">Nothing marked as watched yet.</p>
         @else
-            <div class="media-grid">
+            <div class="library-grid">
                 @foreach($watched as $item)
-                    @include('partials.media-card', ['item' => is_array($item) ? $item : $item->toArray()])
+                    @php
+                        $media = $item->mediaItem;
+                    @endphp
+
+                    @if($media)
+                        <div class="library-card">
+                            @include('partials.media-card', [
+                                'item' => [
+                                    'id' => $media->id,
+                                    'title' => $media->title,
+                                    'poster' => $media->poster ?? null,
+                                    'rating' => round($media->reviews->avg('rating') ?? 0, 1),
+                                    'type' => $media->type,
+                                    'year' => $media->year,
+                                ]
+                            ])
+
+                            <form method="POST" action="{{ route('library.remove') }}">
+                                @csrf
+                                <input type="hidden" name="media_item_id" value="{{ $media->id }}">
+
+                                <button type="submit" class="remove-btn">
+                                    Remove
+                                </button>
+                            </form>
+                        </div>
+                    @endif
                 @endforeach
             </div>
         @endif
@@ -74,121 +102,110 @@
 
 </div>
 
-@endsection
-
-@push('styles')
 <style>
 .library-page {
-    max-width: 1400px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 3rem 2.5rem 4rem;
+    padding: 48px 24px;
 }
 
-.library-page__header { margin-bottom: 2rem; }
-.library-page__title {
+.library-title {
     font-family: var(--font-display);
-    font-size: clamp(2.5rem, 5vw, 3.5rem);
-    letter-spacing: 1px;
-}
-.library-page__sub {
-    color: var(--color-muted);
-    font-size: 0.9rem;
-    margin-top: 0.4rem;
-    display: flex;
-    gap: 0.5rem;
+    font-size: 72px;
+    margin-bottom: 16px;
 }
 
-/* ===== TABS ===== */
-.tabs {
-    display: flex;
-    gap: 0;
-    margin-bottom: 2rem;
-    border-bottom: 1px solid var(--color-border);
+.library-subtitle {
+    color: var(--color-muted);
+    margin-bottom: 40px;
 }
-.tab-btn {
+
+.library-tabs {
+    display: flex;
+    gap: 32px;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 32px;
+}
+
+.library-tab {
     background: transparent;
     border: none;
-    border-bottom: 2px solid transparent;
     color: var(--color-muted);
-    font-family: var(--font-body);
-    font-size: 0.95rem;
-    font-weight: 500;
-    padding: 0.7rem 1.4rem;
+    padding: 14px 0;
+    font-size: 18px;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.2s;
-    margin-bottom: -1px; /* overlap border-bottom */
+    border-bottom: 3px solid transparent;
 }
-.tab-btn:hover { color: var(--color-text); }
-.tab-btn--active {
+
+.library-tab.active {
     color: var(--color-text);
     border-bottom-color: var(--color-accent);
 }
-.tab-count {
+
+.library-tab span {
+    margin-left: 8px;
     background: var(--color-border);
     color: var(--color-muted);
-    border-radius: 20px;
-    padding: 0.1rem 0.5rem;
-    font-size: 0.72rem;
-    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 14px;
 }
-.tab-btn--active .tab-count {
+
+.library-tab.active span {
     background: rgba(232,70,42,0.15);
     color: var(--color-accent);
 }
 
-/* ===== MEDIA GRID ===== */
-.media-grid {
+.library-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
-    gap: 1.2rem;
+    gap: 24px;
 }
 
-/* ===== EMPTY STATE ===== */
-.empty-library {
-    padding: 5rem 2rem;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
+.library-card {
+    max-width: 190px;
+}
+
+.remove-btn {
+    width: 100%;
+    margin-top: 10px;
+    background: #991b1b;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.remove-btn:hover {
+    background: #b91c1c;
+}
+
+.empty-text {
     color: var(--color-muted);
+    padding: 48px 0;
 }
-.empty-library span { font-size: 3.5rem; }
-.empty-library p { font-size: 0.95rem; }
 </style>
-@endpush
 
-@push('scripts')
 <script>
 function showTab(tab) {
-    const plannedEl    = document.getElementById('tab-planned');
-    const watchedEl    = document.getElementById('tab-watched');
-    const btnPlanned   = document.getElementById('tab-planned-btn');
-    const btnWatched   = document.getElementById('tab-watched-btn');
+    const plannedTab = document.getElementById('plannedTab');
+    const watchedTab = document.getElementById('watchedTab');
+    const plannedBtn = document.getElementById('plannedBtn');
+    const watchedBtn = document.getElementById('watchedBtn');
 
     if (tab === 'planned') {
-        plannedEl.style.display = 'block';
-        watchedEl.style.display = 'none';
-        btnPlanned.classList.add('tab-btn--active');
-        btnWatched.classList.remove('tab-btn--active');
+        plannedTab.style.display = 'block';
+        watchedTab.style.display = 'none';
+        plannedBtn.classList.add('active');
+        watchedBtn.classList.remove('active');
     } else {
-        watchedEl.style.display = 'block';
-        plannedEl.style.display = 'none';
-        btnWatched.classList.add('tab-btn--active');
-        btnPlanned.classList.remove('tab-btn--active');
+        plannedTab.style.display = 'none';
+        watchedTab.style.display = 'block';
+        watchedBtn.classList.add('active');
+        plannedBtn.classList.remove('active');
     }
-
-    // Update URL hash so refreshing keeps the tab
-    window.location.hash = tab;
-}
-
-// Restore tab from URL hash on load (e.g. /library#watched)
-const hash = window.location.hash.replace('#', '');
-if (hash === 'watched' || hash === 'planned') {
-    showTab(hash);
 }
 </script>
-@endpush
+
+@endsection

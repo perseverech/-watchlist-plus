@@ -2,73 +2,64 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\MediaUser;
+use Illuminate\Http\Request;
 
 class LibraryController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
-    /**
-     * GET /library
-     * Renders library/index.blade.php
-     */
     public function library()
     {
         $userId = auth()->id();
 
-        // ⚠️ DEPENDS ON AL'ZHANA: MediaUser->mediaItem relationship
-        $planned = MediaUser::with('mediaItem')
-            ->where('user_id', $userId)
+        $planned = MediaUser::where('user_id', $userId)
             ->where('status', 'planned')
-            ->latest()
-            ->get()
-            ->map(fn($mu) => $mu->mediaItem);
+            ->with('mediaItem')
+            ->get();
 
-        $watched = MediaUser::with('mediaItem')
-            ->where('user_id', $userId)
+        $watched = MediaUser::where('user_id', $userId)
             ->where('status', 'watched')
-            ->latest()
-            ->get()
-            ->map(fn($mu) => $mu->mediaItem);
+            ->with('mediaItem')
+            ->get();
 
         return view('library.index', compact('planned', 'watched'));
     }
 
-    /**
-     * POST /library/update
-     * AJAX endpoint
-     */
     public function updateStatus(Request $request)
     {
-        $request->validate([
-            'media_id' => 'required|integer',
-            'status'   => 'required|in:planned,watched',
-        ]);
+        $mediaItemId = $request->input('media_item_id');
+        $status = $request->input('status');
 
-        $entry = MediaUser::updateOrCreate(
-            ['user_id'  => auth()->id(), 'media_id' => $request->media_id],
-            ['status'   => $request->status]
+        MediaUser::updateOrCreate(
+            [
+                'user_id' => auth()->id(),
+                'media_item_id' => $mediaItemId,
+            ],
+            [
+                'status' => $status,
+            ]
         );
 
-        return response()->json(['success' => true, 'status' => $entry->status]);
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+            ]);
+        }
+
+        return redirect()->route('library');
     }
 
-    /**
-     * POST /library/remove
-     * AJAX endpoint
-     */
     public function removeFromLibrary(Request $request)
     {
-        $request->validate(['media_id' => 'required|integer']);
-
         MediaUser::where('user_id', auth()->id())
-            ->where('media_id', $request->media_id)
+            ->where('media_item_id', $request->input('media_item_id'))
             ->delete();
 
-        return response()->json(['success' => true]);
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+            ]);
+        }
+
+        return redirect()->route('library');
     }
 }

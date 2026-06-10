@@ -1,36 +1,32 @@
-{{-- ============================================================
-     FILE: resources/views/partials/media-card.blade.php
-     Reusable card used in: media/index.blade.php, library/index.blade.php
+@php
+    $id = data_get($item, 'id');
+    $title = data_get($item, 'title');
+    $poster = data_get($item, 'poster');
+    $rating = data_get($item, 'rating', 0);
+    $type = data_get($item, 'type', 'movie');
+    $year = data_get($item, 'year');
+@endphp
 
-     ⚠️ DEPENDS ON AL'ZHANA — expects $item with keys:
-       id     (int)
-       title  (string)
-       poster (string — full URL or null)
-       rating (float)
-       type   (string — 'movie' or 'tv')
-       year   (int — optional)
-     ============================================================ --}}
-
-<a href="{{ route('media.show', $item['id']) }}" class="media-card">
+<a href="{{ route('media.show', $id) }}" class="media-card">
     <div class="media-card__poster">
 
-        @if(!empty($item['poster']))
+        @if(!empty($poster))
             <img
-                src="{{ $item['poster'] }}"
-                alt="{{ $item['title'] }}"
+                src="{{ $poster }}"
+                alt="{{ $title }}"
                 loading="lazy"
                 onerror="this.src='/images/no-poster.svg'"
             >
         @else
-            <div class="media-card__no-poster"><span>No Image</span></div>
+            <div class="media-card__no-poster">
+                <span>No Image</span>
+            </div>
         @endif
 
-        {{-- Type badge (MOVIE / TV) --}}
         <div class="media-card__badge">
-            {{ strtoupper($item['type'] ?? 'MOVIE') }}
+            {{ strtoupper($type) }}
         </div>
 
-        {{-- Hover overlay --}}
         <div class="media-card__overlay">
             <span class="media-card__view-btn">View Details →</span>
         </div>
@@ -38,21 +34,21 @@
     </div>
 
     <div class="media-card__info">
-        <h3 class="media-card__title">{{ $item['title'] }}</h3>
+        <h3 class="media-card__title">{{ $title }}</h3>
+
         <div class="media-card__meta">
-            <span class="media-card__rating">⭐ {{ number_format($item['rating'] ?? 0, 1) }}</span>
-            @if(!empty($item['year']))
-                <span class="media-card__year">{{ $item['year'] }}</span>
+            <span class="media-card__rating">
+                ⭐ {{ number_format($rating, 1) }}
+            </span>
+
+            @if(!empty($year))
+                <span class="media-card__year">{{ $year }}</span>
             @endif
         </div>
     </div>
 </a>
 
 <style>
-/* These styles only need to be loaded once.
-   Since this partial can be included many times, wrap in a flag.
-   If you prefer, move these styles into app.blade.php global <style> block. */
-
 .media-card {
     display: block;
     text-decoration: none;
@@ -62,16 +58,12 @@
     border-radius: 10px;
     overflow: hidden;
     transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
-    animation: cardIn 0.4s ease both;
 }
+
 .media-card:hover {
     transform: translateY(-6px);
     border-color: var(--color-accent);
     box-shadow: 0 16px 40px rgba(232,70,42,0.15);
-}
-@keyframes cardIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
 }
 
 .media-card__poster {
@@ -80,14 +72,13 @@
     overflow: hidden;
     background: var(--color-bg);
 }
+
 .media-card__poster img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.4s ease;
     display: block;
 }
-.media-card:hover .media-card__poster img { transform: scale(1.06); }
 
 .media-card__no-poster {
     width: 100%;
@@ -115,7 +106,6 @@
     letter-spacing: 1px;
     padding: 0.2rem 0.5rem;
     border-radius: 4px;
-    backdrop-filter: blur(4px);
 }
 
 .media-card__overlay {
@@ -128,7 +118,10 @@
     opacity: 0;
     transition: opacity 0.25s;
 }
-.media-card:hover .media-card__overlay { opacity: 1; }
+
+.media-card:hover .media-card__overlay {
+    opacity: 1;
+}
 
 .media-card__view-btn {
     color: #fff;
@@ -139,7 +132,10 @@
     border-radius: 6px;
 }
 
-.media-card__info { padding: 0.8rem; }
+.media-card__info {
+    padding: 0.8rem;
+}
+
 .media-card__title {
     font-size: 0.88rem;
     font-weight: 600;
@@ -148,12 +144,20 @@
     text-overflow: ellipsis;
     margin-bottom: 0.35rem;
 }
+
 .media-card__meta {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
-.media-card__rating { font-size: 0.78rem; color: var(--color-accent2); }
-.media-card__year   { font-size: 0.72rem; color: var(--color-muted); }
-</style>
 
+.media-card__rating {
+    font-size: 0.78rem;
+    color: var(--color-accent2);
+}
+
+.media-card__year {
+    font-size: 0.72rem;
+    color: var(--color-muted);
+}
+</style>

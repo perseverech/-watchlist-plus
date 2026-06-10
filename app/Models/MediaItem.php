@@ -9,11 +9,18 @@ class MediaItem extends Model
     protected $fillable = [
         'title',
         'type',
+        'genre',
+        'year',
         'description',
     ];
 
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+
+    public static function getTrending()
+    {
+        return self::latest()->take(6)->get();
     }
 }
