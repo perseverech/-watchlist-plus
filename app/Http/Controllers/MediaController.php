@@ -18,7 +18,7 @@ class MediaController extends Controller
             ->orderBy('genre')
             ->get()
             ->map(function ($item) {
-                return (object)[
+                return (object) [
                     'id' => $item->genre,
                     'name' => $item->genre,
                 ];
@@ -52,7 +52,7 @@ class MediaController extends Controller
                 'id' => $item->id,
                 'title' => $item->title,
                 'poster' => $item->poster,
-                'rating' => round($item->reviews->avg('rating') ?? 0, 1),
+                'rating' => $item->rating,
                 'type' => $item->type,
                 'year' => $item->year,
             ];
@@ -65,7 +65,10 @@ class MediaController extends Controller
     {
         $media = MediaItem::findOrFail($id);
 
-        $reviews = $media->reviews()->latest()->get();
+        $reviews = $media->reviews()
+            ->with('user')
+            ->latest()
+            ->get();
 
         $userStatus = null;
 

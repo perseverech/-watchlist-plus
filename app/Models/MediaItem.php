@@ -12,6 +12,7 @@ class MediaItem extends Model
         'genre',
         'year',
         'description',
+        'rating',
     ];
 
     public function reviews()

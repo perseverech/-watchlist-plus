@@ -3,83 +3,91 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Review;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class ReviewController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
-    /**
-     * POST /reviews
-     * AJAX endpoint
-     */
     public function store(Request $request)
     {
         $data = $request->validate([
-            'media_id' => 'required|integer',
-            'rating'   => 'required|integer|min:1|max:10',
-            'content'  => 'required|string|min:10|max:1000',
+            'media_item_id' => 'required|integer',
+            'rating' => 'required|integer|min:1|max:10',
+            'comment' => 'nullable|string|max:1000',
         ]);
 
-        // ⚠️ DEPENDS ON AL'ZHANA: Review model
-        $review = Review::create([
-            'user_id'  => auth()->id(),
-            'media_id' => $data['media_id'],
-            'rating'   => $data['rating'],
-            'content'  => $data['content'],
-        ]);
+        $review = [
+            'user_id' => auth()->id(),
+            'rating' => $data['rating'],
+        ];
 
-        $review->load('user');
+        if (Schema::hasColumn('reviews', 'media_item_id')) {
+            $review['media_item_id'] = $data['media_item_id'];
+        }
 
-        return response()->json($review, 201);
+        if (Schema::hasColumn('reviews', 'media_id')) {
+            $review['media_id'] = $data['media_item_id'];
+        }
+
+        if (Schema::hasColumn('reviews', 'comment')) {
+            $review['comment'] = $data['comment'] ?? '';
+        }
+
+        if (Schema::hasColumn('reviews', 'content')) {
+            $review['content'] = $data['comment'] ?? '';
+        }
+
+        if (Schema::hasColumn('reviews', 'created_at')) {
+            $review['created_at'] = now();
+        }
+
+        if (Schema::hasColumn('reviews', 'updated_at')) {
+            $review['updated_at'] = now();
+        }
+
+        DB::table('reviews')->insert($review);
+
+        return back();
     }
 
-    /**
-     * PUT /reviews/{id}
-     * AJAX endpoint
-     */
     public function update(Request $request, $id)
     {
         $data = $request->validate([
-            'rating'  => 'required|integer|min:1|max:10',
-            'content' => 'required|string|min:10|max:1000',
+            'rating' => 'required|integer|min:1|max:10',
+            'comment' => 'nullable|string|max:1000',
         ]);
 
-        $review = Review::findOrFail($id);
+        $review = [
+            'rating' => $data['rating'],
+        ];
 
-        if ($review->user_id !== auth()->id()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+        if (Schema::hasColumn('reviews', 'comment')) {
+            $review['comment'] = $data['comment'] ?? '';
         }
 
-        $review->update($data);
+        if (Schema::hasColumn('reviews', 'content')) {
+            $review['content'] = $data['comment'] ?? '';
+        }
 
-        return response()->json($review);
+        if (Schema::hasColumn('reviews', 'updated_at')) {
+            $review['updated_at'] = now();
+        }
+
+        DB::table('reviews')
+            ->where('id', $id)
+            ->where('user_id', auth()->id())
+            ->update($review);
+
+        return back();
     }
 
-    /**
-     * DELETE /reviews/{id}
-     * AJAX endpoint
-     */
     public function destroy($id)
     {
-        $review = Review::findOrFail($id);
+        DB::table('reviews')
+            ->where('id', $id)
+            ->where('user_id', auth()->id())
+            ->delete();
 
-        // ⚠️ DEPENDS ON AL'ZHANA: Role checks
-        $isOwner     = $review->user_id === auth()->id();
-        $isModerator = in_array(
-            auth()->user()->role->name ?? '',
-            ['moderator', 'admin']
-        );
-
-        if (!$isOwner && !$isModerator) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-
-        $review->delete();
-
-        return response()->json(['success' => true]);
+        return back();
     }
 }

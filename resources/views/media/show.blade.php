@@ -1,4 +1,21 @@
+@php
+    $posterMap = [
+        'Inception' => '/images/posters/inception.jpg',
+        'Breaking Bad' => '/images/posters/breaking-bad.jpg',
+        'Interstellar' => '/images/posters/interstellar.jpg',
+        'Spider-Man: Into the Spider-Verse' => '/images/posters/spider-verse.jpg',
+        'Frozen' => '/images/posters/frozen.jpg',
+    ];
+
+    $poster = $media->poster ?? null;
+
+    if (empty($poster)) {
+        $poster = $posterMap[$media->title] ?? null;
+    }
+@endphp
+
 @extends('layouts.app')
+
 @section('title', $media->title ?? 'Media Detail')
 
 @section('content')
@@ -10,8 +27,12 @@
     </a>
 
     <div style="display: flex; gap: 32px; margin-top: 32px; align-items: flex-start;">
-        <div style="width: 220px; height: 330px; background: #13131a; border: 1px solid #1e1e2e; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #6b6b80;">
-            No Poster
+        <div style="width: 220px; height: 330px; background: #13131a; border: 1px solid #1e1e2e; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; color: #6b6b80;">
+            @if($poster)
+                <img src="{{ $poster }}" alt="{{ $media->title }}" style="width: 100%; height: 100%; object-fit: cover;">
+            @else
+                No Poster
+            @endif
         </div>
 
         <div style="flex: 1;">
@@ -22,9 +43,13 @@
                 @endif
             </p>
 
-            <h1 style="font-size: 52px; font-family: var(--font-display); letter-spacing: 1px; margin-bottom: 16px;">
+            <h1 style="font-size: 52px; font-family: var(--font-display); letter-spacing: 1px; margin-bottom: 10px;">
                 {{ $media->title }}
             </h1>
+
+            <div style="font-size:22px; color:#f5c542; font-weight:700; margin-bottom:18px;">
+                ⭐ {{ number_format($media->rating, 1) }} / 10
+            </div>
 
             <p style="color: #6b6b80; margin-bottom: 24px; max-width: 600px;">
                 {{ $media->description }}
@@ -102,7 +127,11 @@
         @endauth
 
         @forelse($reviews as $review)
-            <div style="background: #13131a; border: 1px solid #1e1e2e; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+            <div style="background: #13131a; border: 1px solid #1e1e2e; border-radius: 12px; padding: 18px; margin-bottom: 12px;">
+                <p style="color: #e8e8f0; font-weight: 700; margin-bottom: 6px;">
+                    {{ $review->user->name ?? 'User' }}
+                </p>
+
                 <p style="color: #f5a623; margin-bottom: 8px;">
                     Rating: {{ $review->rating }}/10
                 </p>

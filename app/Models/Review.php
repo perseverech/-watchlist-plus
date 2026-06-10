@@ -12,4 +12,14 @@ class Review extends Model
         'rating',
         'comment',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function media()
+    {
+        return $this->belongsTo(MediaItem::class, 'media_item_id');
+    }
 }

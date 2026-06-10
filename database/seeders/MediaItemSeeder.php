@@ -17,6 +17,7 @@ class MediaItemSeeder extends Seeder
             'genre' => 'Sci-Fi',
             'year' => 2010,
             'description' => 'A mind-bending thriller',
+            'rating' => 8.8,
         ]);
 
         MediaItem::create([
@@ -25,6 +26,7 @@ class MediaItemSeeder extends Seeder
             'genre' => 'Drama',
             'year' => 2008,
             'description' => 'A chemistry teacher becomes a drug kingpin',
+            'rating' => 9.5,
         ]);
 
         MediaItem::create([
@@ -33,6 +35,7 @@ class MediaItemSeeder extends Seeder
             'genre' => 'Sci-Fi',
             'year' => 2014,
             'description' => 'Space exploration and time',
+            'rating' => 8.7,
         ]);
 
         MediaItem::create([
@@ -41,6 +44,7 @@ class MediaItemSeeder extends Seeder
             'genre' => 'Animation',
             'year' => 2018,
             'description' => 'Animated multiverse superhero adventure',
+            'rating' => 8.4,
         ]);
 
         MediaItem::create([
@@ -49,6 +53,7 @@ class MediaItemSeeder extends Seeder
             'genre' => 'Family',
             'year' => 2013,
             'description' => 'Disney fantasy animation',
+            'rating' => 7.4,
         ]);
     }
 }
