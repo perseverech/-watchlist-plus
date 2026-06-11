@@ -1,35 +1,33 @@
 @extends('layouts.app')
 
-@section('title', 'My Library')
+@section('title', __('messages.my_library'))
 
 @section('content')
-
 <div class="library-page">
 
     <h1 class="library-title">{{ __('messages.my_library') }}</h1>
 
     <p class="library-subtitle">
-    {{ $planned->count() }} {{ __('messages.planned') }}
-    ·
-    {{ $watched->count() }} {{ __('messages.watched') }}
-</p>
+        {{ $planned->count() }} {{ __('messages.planned') }}
+        ·
+        {{ $watched->count() }} {{ __('messages.watched') }}
+    </p>
 
     <div class="library-tabs">
         <button id="plannedBtn" class="library-tab active" onclick="showTab('planned')">
-    {{ __('messages.planned') }}
-    <span>{{ $planned->count() }}</span>
-</button>
+            {{ __('messages.planned') }}
+            <span>{{ $planned->count() }}</span>
+        </button>
 
         <button id="watchedBtn" class="library-tab" onclick="showTab('watched')">
-    {{ __('messages.watched') }}
-    <span>{{ $watched->count() }}</span>
-</button>
+            {{ __('messages.watched') }}
+            <span>{{ $watched->count() }}</span>
         </button>
     </div>
 
     <div id="plannedTab" class="tab-content">
         @if($planned->isEmpty())
-            <p class="empty-text">Nothing in your planned list yet.</p>
+            <p class="empty-text">{{ __('messages.empty_planned') }}</p>
         @else
             <div class="library-grid">
                 @foreach($planned as $item)
@@ -54,9 +52,9 @@
                                 @csrf
                                 <input type="hidden" name="media_item_id" value="{{ $media->id }}">
 
-                                <button class="remove-btn">
-    {{ __('messages.remove') }}
-</button>
+                                <button type="submit" class="remove-btn">
+                                    {{ __('messages.remove') }}
+                                </button>
                             </form>
                         </div>
                     @endif
@@ -67,7 +65,7 @@
 
     <div id="watchedTab" class="tab-content" style="display:none;">
         @if($watched->isEmpty())
-            <p class="empty-text">Nothing marked as watched yet.</p>
+            <p class="empty-text">{{ __('messages.empty_watched') }}</p>
         @else
             <div class="library-grid">
                 @foreach($watched as $item)
@@ -92,9 +90,9 @@
                                 @csrf
                                 <input type="hidden" name="media_item_id" value="{{ $media->id }}">
 
-                                <button type="submit">
-    Remove
-</button>
+                                <button type="submit" class="remove-btn">
+                                    {{ __('messages.remove') }}
+                                </button>
                             </form>
                         </div>
                     @endif
@@ -172,16 +170,19 @@
 .remove-btn {
     width: 100%;
     margin-top: 10px;
-    background: #991b1b;
-    color: white;
-    border: none;
-    padding: 10px;
+    padding: 9px 14px;
+    background: transparent;
+    color: #e8462a;
+    border: 1px solid #e8462a;
     border-radius: 8px;
     cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.2s;
 }
 
 .remove-btn:hover {
-    background: #b91c1c;
+    background: rgba(232, 70, 42, 0.12);
 }
 
 .empty-text {
@@ -210,5 +211,4 @@ function showTab(tab) {
     }
 }
 </script>
-
 @endsection
