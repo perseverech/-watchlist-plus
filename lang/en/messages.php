@@ -88,8 +88,4 @@ return [
     'no_users' => 'No users found.',
     'no_logs' => 'No logs recorded yet.',
     'recommended_by_genre' => 'Recommended by selected genre',
-    'empty_planned' => 'Nothing in your planned list yet.',
-'empty_watched' => 'Nothing marked as watched yet.',
-'block_user' => 'User blocked',
-'unblock_user' => 'User unblocked',
 ];

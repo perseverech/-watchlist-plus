@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('messages.admin') . ' — ' . __('messages.audit_logs'))
+@section('title', 'Admin — Audit Logs')
 
 @section('content')
 <div class="admin-page">
@@ -11,12 +11,12 @@
         <nav class="admin-nav">
             <a href="{{ route('admin.users') }}"
                class="{{ request()->routeIs('admin.users') ? 'active' : '' }}">
-                {{ __('messages.users') }}
+                Users
             </a>
 
             <a href="{{ route('admin.logs') }}"
                class="{{ request()->routeIs('admin.logs') ? 'active' : '' }}">
-                {{ __('messages.audit_logs') }}
+                Audit Logs
             </a>
         </nav>
     </aside>
@@ -24,7 +24,7 @@
     <div class="admin-content">
 
         <div class="admin-content__header">
-            <h1>{{ __('messages.audit_logs') }}</h1>
+            <h1>Audit Logs</h1>
         </div>
 
         <div class="admin-table-wrap">
@@ -32,51 +32,41 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>{{ __('messages.date') }}</th>
-                        <th>{{ __('messages.user') }}</th>
-                        <th>{{ __('messages.admin_action') }}</th>
-                        <th>{{ __('messages.entity') }}</th>
-                        <th>{{ __('messages.entity_id') }}</th>
+                        <th>Timestamp</th>
+                        <th>User</th>
+                        <th>Action</th>
+                        <th>Entity</th>
+                        <th>Entity ID</th>
                     </tr>
                 </thead>
 
                 <tbody>
                     @forelse($logs as $log)
-                        @php
-                            $actionWord = strtolower(explode('_', $log->action)[0]);
-
-                            $translatedAction = match($log->action) {
-                                'BLOCK_USER' => __('messages.block_user'),
-                                'UNBLOCK_USER' => __('messages.unblock_user'),
-                                default => $log->action,
-                            };
-
-                            $translatedEntity = $log->entity === 'User'
-                                ? __('messages.user')
-                                : $log->entity;
-                        @endphp
-
                         <tr>
                             <td class="td--muted">#{{ $log->id }}</td>
 
                             <td class="td--muted td--nowrap">
-                                {{ \Carbon\Carbon::parse($log->timestamp)->locale(app()->getLocale())->translatedFormat('d F Y, H:i') }}
+                                {{ \Carbon\Carbon::parse($log->timestamp)->format('d M Y, H:i') }}
                             </td>
 
                             <td>{{ $log->user->name ?? '—' }}</td>
 
                             <td>
+                                @php
+                                    $actionWord = strtolower(explode('_', $log->action)[0]);
+                                @endphp
+
                                 <span class="action-log-badge action-log--{{ $actionWord }}">
-                                    {{ $translatedAction }}
+                                    {{ $log->action }}
                                 </span>
                             </td>
 
-                            <td class="td--muted">{{ $translatedEntity }}</td>
+                            <td class="td--muted">{{ $log->entity }}</td>
                             <td class="td--muted">{{ $log->entity_id }}</td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="table-empty">{{ __('messages.no_logs') }}</td>
+                            <td colspan="6" class="table-empty">No logs recorded yet.</td>
                         </tr>
                     @endforelse
                 </tbody>
