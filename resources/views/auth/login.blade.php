@@ -1,8 +1,3 @@
-{{-- ============================================================
-     FILE: resources/views/auth/login.blade.php
-     ⚠️ If Laravel Breeze already generated this file, DO NOT replace it.
-        Instead just restyle the existing one to match the design.
-     ============================================================ --}}
 @extends('layouts.app')
 @section('title', __('messages.login'))
 
@@ -12,10 +7,9 @@
 
         <div class="auth-card__header">
             <h1>{{ __('messages.login') }}</h1>
-            <p>Welcome back. Pick up where you left off.</p>
+            <p>{{ __('messages.login_subtitle') }}</p>
         </div>
 
-        {{-- Validation errors from AuthController --}}
         @if($errors->any())
             <div class="auth-errors">
                 @foreach($errors->all() as $error)
@@ -28,20 +22,20 @@
             @csrf
 
             <div class="form-group">
-                <label for="email">Email</label>
+                <label for="email">{{ __('messages.email') }}</label>
                 <input
                     type="email"
                     id="email"
                     name="email"
                     value="{{ old('email') }}"
-                    placeholder="you@example.com"
+                    placeholder="yourname@example.com"
                     required
                     autocomplete="email"
                 >
             </div>
 
             <div class="form-group">
-                <label for="password">Password</label>
+                <label for="password">{{ __('messages.password') }}</label>
                 <input
                     type="password"
                     id="password"
@@ -55,7 +49,7 @@
             <div class="form-group form-group--row">
                 <label class="checkbox-label">
                     <input type="checkbox" name="remember">
-                    <span>Remember me</span>
+                    <span>{{ __('messages.remember_me') }}</span>
                 </label>
             </div>
 
@@ -65,7 +59,7 @@
         </form>
 
         <p class="auth-card__footer">
-            Don't have an account?
+            {{ __('messages.no_account') }}
             <a href="{{ route('register') }}">{{ __('messages.register') }}</a>
         </p>
 

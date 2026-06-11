@@ -52,8 +52,8 @@
             <a href="{{ route('lang.switch', 'en') }}"
                class="{{ app()->getLocale() === 'en' ? 'lang--active' : '' }}">EN</a>
             <span>/</span>
-            <a href="{{ route('lang.switch', 'lt') }}"
-               class="{{ app()->getLocale() === 'lt' ? 'lang--active' : '' }}">LT</a>
+            <a href="{{ route('lang.switch', 'ru') }}"
+               class="{{ app()->getLocale() === 'ru' ? 'lang--active' : '' }}">RU</a>
         </div>
 
         @guest

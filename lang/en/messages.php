@@ -1,8 +1,4 @@
 <?php
-// ============================================================
-//  FILE: lang/en/messages.php
-//  English strings — used in Blade with {{ __('messages.key') }}
-// ============================================================
 return [
     'home'             => 'Home',
     'my_library'       => 'My Library',
@@ -23,4 +19,36 @@ return [
     'write_review'     => 'Write a Review',
     'review_placeholder' => 'Share your thoughts about this...',
     'submit'           => 'Submit',
+    'login_subtitle' => 'Welcome back. Pick up where you left off.',
+'email' => 'Email',
+'password' => 'Password',
+'remember_me' => 'Remember me',
+'no_account' => "Don't have an account?",
+'filtered_results' => 'Filtered Results',
+'results_for' => 'Results for',
+'something_wrong' => 'Something went wrong. Try again.',
+'no_image' => 'No Image',
+'view_details' => 'View Details',
+'movie' => 'Movie',
+'series' => 'Series',
+
+'action' => 'Action',
+'adventure' => 'Adventure',
+'animation' => 'Animation',
+'biography' => 'Biography',
+'comedy' => 'Comedy',
+'crime' => 'Crime',
+'documentary' => 'Documentary',
+'drama' => 'Drama',
+'family' => 'Family',
+'fantasy' => 'Fantasy',
+'history' => 'History',
+'horror' => 'Horror',
+'mystery' => 'Mystery',
+'romance' => 'Romance',
+'sci_fi' => 'Sci-Fi',
+'sport' => 'Sport',
+'thriller' => 'Thriller',
+'war' => 'War',
+'western' => 'Western',
 ];
