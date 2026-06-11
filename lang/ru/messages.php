@@ -32,7 +32,6 @@ return [
 'view_details' => 'Подробнее',
 'movie' => 'Фильм',
 'series' => 'Сериал',
-
 'action' => 'Боевик',
 'adventure' => 'Приключения',
 'animation' => 'Анимация',
@@ -52,4 +51,11 @@ return [
 'thriller' => 'Триллер',
 'war' => 'Военный',
 'western' => 'Вестерн',
+'my_library' => 'Моя библиотека',
+'planned' => 'Запланировано',
+'watched' => 'Просмотрено',
+'remove' => 'Удалить',
+'planned_count' => 'Запланировано',
+'watched_count' => 'Просмотрено',
+'remove' => 'Удалить',
 ];

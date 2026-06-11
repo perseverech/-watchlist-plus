@@ -6,21 +6,24 @@
 
 <div class="library-page">
 
-    <h1 class="library-title">MY LIBRARY</h1>
+    <h1 class="library-title">{{ __('messages.my_library') }}</h1>
 
     <p class="library-subtitle">
-        {{ $planned->count() }} Planned · {{ $watched->count() }} Watched
-    </p>
+    {{ $planned->count() }} {{ __('messages.planned') }}
+    ·
+    {{ $watched->count() }} {{ __('messages.watched') }}
+</p>
 
     <div class="library-tabs">
         <button id="plannedBtn" class="library-tab active" onclick="showTab('planned')">
-            Planned
-            <span>{{ $planned->count() }}</span>
-        </button>
+    {{ __('messages.planned') }}
+    <span>{{ $planned->count() }}</span>
+</button>
 
         <button id="watchedBtn" class="library-tab" onclick="showTab('watched')">
-            Watched
-            <span>{{ $watched->count() }}</span>
+    {{ __('messages.watched') }}
+    <span>{{ $watched->count() }}</span>
+</button>
         </button>
     </div>
 
@@ -51,9 +54,9 @@
                                 @csrf
                                 <input type="hidden" name="media_item_id" value="{{ $media->id }}">
 
-                                <button type="submit" class="remove-btn">
-                                    Remove
-                                </button>
+                                <button class="remove-btn">
+    {{ __('messages.remove') }}
+</button>
                             </form>
                         </div>
                     @endif
@@ -89,9 +92,9 @@
                                 @csrf
                                 <input type="hidden" name="media_item_id" value="{{ $media->id }}">
 
-                                <button type="submit" class="remove-btn">
-                                    Remove
-                                </button>
+                                <button type="submit">
+    Remove
+</button>
                             </form>
                         </div>
                     @endif

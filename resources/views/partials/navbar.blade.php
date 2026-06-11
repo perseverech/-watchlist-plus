@@ -1,11 +1,4 @@
-{{-- ============================================================
-     FILE: resources/views/partials/navbar.blade.php
-     Included automatically by layouts/app.blade.php
 
-     ⚠️ DEPENDS ON AL'ZHANA:
-       - auth()->user()->role->name must return 'admin' for admin users
-       - The User model must have a role() relationship
-     ============================================================ --}}
 
 <nav class="navbar">
 
@@ -26,9 +19,6 @@
                class="{{ request()->routeIs('library') ? 'navbar__link--active' : '' }}">
                 {{ __('messages.my_library') }}
             </a>
-
-            {{-- Admin link — only visible to admin role --}}
-            {{-- ⚠️ DEPENDS ON AL'ZHANA: role->name must equal 'admin' --}}
             @if(auth()->user()->role && auth()->user()->role->name === 'admin')
                 <a href="{{ route('admin.users') }}"
                    class="{{ request()->routeIs('admin.*') ? 'navbar__link--active' : '' }}">
@@ -36,8 +26,7 @@
                 </a>
             @endif
 
-            {{-- Moderator link — for moderators --}}
-            {{-- ⚠️ DEPENDS ON AL'ZHANA: role->name must equal 'moderator' --}}
+           
             @if(auth()->user()->role && auth()->user()->role->name === 'moderator')
                 <a href="{{ route('admin.logs') }}">Mod Panel</a>
             @endif

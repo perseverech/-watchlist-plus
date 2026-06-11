@@ -1,8 +1,4 @@
-{{-- ============================================================
-     FILE: resources/views/auth/register.blade.php
-     ⚠️ If Laravel Breeze already generated this file, DO NOT replace it.
-        Just restyle the existing one to match.
-     ============================================================ --}}
+
 @extends('layouts.app')
 @section('title', __('messages.register'))
 

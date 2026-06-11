@@ -31,7 +31,6 @@ return [
 'view_details' => 'View Details',
 'movie' => 'Movie',
 'series' => 'Series',
-
 'action' => 'Action',
 'adventure' => 'Adventure',
 'animation' => 'Animation',
@@ -51,4 +50,11 @@ return [
 'thriller' => 'Thriller',
 'war' => 'War',
 'western' => 'Western',
+'my_library' => 'My Library',
+'planned' => 'Planned',
+'watched' => 'Watched',
+'remove' => 'Remove',
+'planned_count' => 'Planned',
+'watched_count' => 'Watched',
+'remove' => 'Remove',
 ];

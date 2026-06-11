@@ -1,12 +1,4 @@
-{{-- ============================================================
-     FILE: resources/views/partials/review-card.blade.php
-     Single review card — used in media/show.blade.php
 
-     ⚠️ DEPENDS ON AL'ZHANA — $review must be a Review model with:
-       ->id, ->rating, ->content, ->created_at
-       ->user_id
-       ->user->username   (eager loaded via Review::with('user'))
-     ============================================================ --}}
 
 <div class="review-card" id="review-{{ $review->id }}">
 
@@ -42,8 +34,6 @@
             </div>
         @endif
 
-        {{-- Moderator/Admin can also delete any review --}}
-        {{-- ⚠️ DEPENDS ON AL'ZHANA: role name must be 'moderator' or 'admin' --}}
         @if(auth()->id() !== $review->user_id &&
             in_array(auth()->user()->role->name ?? '', ['moderator', 'admin']))
             <div class="review-card__actions">
@@ -115,12 +105,6 @@
 </style>
 
 <script>
-// ============================================================
-//  deleteReview — AJAX DELETE /reviews/{id}
-//  ⚠️ DEPENDS ON AL'ZHANA:
-//    DELETE /reviews/{id} must return { success: true }
-//    ReviewController@destroy handles auth check server-side
-// ============================================================
 async function deleteReview(reviewId) {
     if (!confirm('Delete this review?')) return;
 

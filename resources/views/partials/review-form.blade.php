@@ -1,12 +1,4 @@
-{{-- ============================================================
-     FILE: resources/views/partials/review-form.blade.php
-     Included in media/show.blade.php for logged-in users
 
-     ⚠️ DEPENDS ON AL'ZHANA:
-       POST /reviews must accept { media_id, rating, content }
-       and return the created Review as JSON with:
-       { id, rating, content, user: { username } }
-     ============================================================ --}}
 
 <div class="review-form-wrap" id="review-form-wrap">
     <h3 class="review-form__title">{{ __('messages.write_review') }}</h3>
@@ -151,12 +143,7 @@ document.getElementById('review-content').addEventListener('input', function() {
     document.getElementById('char-count').textContent = this.value.length;
 });
 
-// ============================================================
-//  submitReview — sends AJAX POST to /reviews
-//  ⚠️ DEPENDS ON AL'ZHANA:
-//    POST /reviews → { media_id, rating, content }
-//    Returns: { id, rating, content, user: { username } }
-// ============================================================
+
 async function submitReview(mediaId) {
     const ratingInput  = document.getElementById('review-rating');
     const contentInput = document.getElementById('review-content');
