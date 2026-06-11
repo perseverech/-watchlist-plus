@@ -139,6 +139,20 @@
                 <p style="color: #e8e8f0;">
                     {{ $review->comment ?? $review->content }}
                 </p>
+                @auth
+@if(auth()->id() == $review->user_id || auth()->user()->role == 'admin')
+<form action="{{ route('reviews.destroy', $review->id) }}" method="POST" style="margin-top:12px;">
+    @csrf
+    @method('DELETE')
+
+    <button
+        type="submit"
+        style="background:#c62828;color:white;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;">
+        Delete Review
+    </button>
+</form>
+@endif
+@endauth
             </div>
         @empty
             <p style="color: #6b6b80;">No reviews yet. Be the first!</p>

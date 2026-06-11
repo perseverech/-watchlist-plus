@@ -19,7 +19,7 @@
                class="{{ request()->routeIs('library') ? 'navbar__link--active' : '' }}">
                 {{ __('messages.my_library') }}
             </a>
-            @if(auth()->user()->role && auth()->user()->role->name === 'admin')
+            @if(auth()->user()->role == 'admin')
                 <a href="{{ route('admin.users') }}"
                    class="{{ request()->routeIs('admin.*') ? 'navbar__link--active' : '' }}">
                     Admin
@@ -27,7 +27,7 @@
             @endif
 
            
-            @if(auth()->user()->role && auth()->user()->role->name === 'moderator')
+            @if(auth()->user()->role == 'moderator')
                 <a href="{{ route('admin.logs') }}">Mod Panel</a>
             @endif
         @endauth
@@ -51,7 +51,7 @@
         @endguest
 
         @auth
-            <span class="navbar__username">{{ auth()->user()->username }}</span>
+            <span class="navbar__username">{{ auth()->user()->name }}</span>
             <form method="POST" action="{{ route('logout') }}" style="display:inline">
                 @csrf
                 <button type="submit" class="btn btn--ghost">{{ __('messages.logout') }}</button>

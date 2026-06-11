@@ -82,12 +82,26 @@ class ReviewController extends Controller
     }
 
     public function destroy($id)
-    {
-        DB::table('reviews')
-            ->where('id', $id)
-            ->where('user_id', auth()->id())
-            ->delete();
+{
+    $review = DB::table('reviews')
+        ->where('id', $id)
+        ->first();
 
+    if (!$review) {
         return back();
     }
+
+    if (
+        auth()->id() != $review->user_id &&
+        auth()->user()->role != 'admin'
+    ) {
+        abort(403);
+    }
+
+    DB::table('reviews')
+        ->where('id', $id)
+        ->delete();
+
+    return back();
+}
 }
