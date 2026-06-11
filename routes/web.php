@@ -39,7 +39,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/reviews/{id}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 });
 
-Route::middleware(['auth', 'admin'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/admin/users', [AdminController::class, 'index'])->name('admin.users');
     Route::post('/admin/users/{id}/block', [AdminController::class, 'block'])->name('admin.users.block');
     Route::get('/admin/logs', [AdminController::class, 'logs'])->name('admin.logs');

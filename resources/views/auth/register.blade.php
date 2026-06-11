@@ -23,12 +23,12 @@
             @csrf
 
             <div class="form-group">
-                <label for="username">Username</label>
+                <label for="name">Username</label>
                 <input
                     type="text"
-                    id="username"
-                    name="username"
-                    value="{{ old('username') }}"
+                    id="name"
+                    name="name"
+                    value="{{ old('name') }}"
                     placeholder="cinephile42"
                     required
                     autocomplete="username"

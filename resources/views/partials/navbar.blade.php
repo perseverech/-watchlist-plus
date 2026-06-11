@@ -21,9 +21,9 @@
             </a>
             @if(auth()->user()->role == 'admin')
                 <a href="{{ route('admin.users') }}"
-                   class="{{ request()->routeIs('admin.*') ? 'navbar__link--active' : '' }}">
-                    Admin
-                </a>
+   class="{{ request()->routeIs('admin.*') ? 'navbar__link--active' : '' }}">
+    {{ __('messages.admin') }}
+</a>
             @endif
 
            
