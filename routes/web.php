@@ -13,7 +13,7 @@ Route::get('/media/{id}', [MediaController::class, 'show'])->name('media.show');
 Route::get('/search', [MediaController::class, 'search'])->name('media.search');
 
 Route::get('/lang/{locale}', function (string $locale) {
-    if (in_array($locale, ['en', 'lt'])) {
+    if (in_array($locale, ['en', 'ru'])) {
         session(['locale' => $locale]);
     }
 
