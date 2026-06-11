@@ -87,4 +87,5 @@ return [
 
     'no_users' => 'No users found.',
     'no_logs' => 'No logs recorded yet.',
+    'recommended_by_genre' => 'Recommended by selected genre',
 ];

@@ -290,6 +290,7 @@ const spinner = document.getElementById('search-spinner');
 const resultsTitle = document.getElementById('results-title');
 
 const translations = {
+    recommendedByGenre: @json(__('messages.recommended_by_genre')),
     filteredResults: @json(__('messages.filtered_results')),
     resultsFor: @json(__('messages.results_for')),
     somethingWrong: @json(__('messages.something_wrong')),
@@ -362,9 +363,13 @@ async function fetchResults() {
 
     showSkeleton();
 
-    resultsTitle.textContent = query
-        ? `${translations.resultsFor} "${query}"`
-        : translations.filteredResults;
+    if (genre && !query) {
+    resultsTitle.textContent = translations.recommendedByGenre;
+} else if (query) {
+    resultsTitle.textContent = `${translations.resultsFor} "${query}"`;
+} else {
+    resultsTitle.textContent = translations.filteredResults;
+}
 
     try {
         const params = new URLSearchParams({ query, genre, type });
